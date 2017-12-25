@@ -1,6 +1,8 @@
 // this is the starting point for browserify packaging
 $ = jQuery = require('jquery');
+var React = require('react');
+var ReactDOM = require('react-dom');
 
-var App = console.log("hello, from broweserify");
+var Home = require('./components/homePage');
 
-module.exports = App;
+ReactDOM.render(<Home />, document.getElementById('app'));

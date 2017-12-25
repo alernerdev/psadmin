@@ -5,13 +5,13 @@
 			Administration
 		</title>
 		<link rel='stylesheet' href='css/bundle.css' />
-		<script src='scripts/bundle.js'></script>
 	</head>
 
  	<body>
-		 <div class='jumbotron'>
-			 <h1>Hello World!!</h1>
-		</div>
 		<div id="app"></div>
+
+		<!-- this must be at the bottom. Otherwise it cant find ids mentioned in the body
+		because DOM hasnt been built yet-->
+		<script src='scripts/bundle.js'></script>
  	</body>
 </html>
