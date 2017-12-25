@@ -20,7 +20,7 @@
 		"no-lone-blocks":0
 	},
 	"globals": {
-		"jQuery": true,
-		"$": true
+		"jquery":true,
+		"$":true
 	}
 }
