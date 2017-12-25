@@ -57,3 +57,5 @@ typings/
 # dotenv environment variables file
 .env
 
+# dont checkin what we generate
+dist

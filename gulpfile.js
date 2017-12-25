@@ -7,13 +7,14 @@ var browserify = require('browserify'); // bundles JS
 var reactify = require('reactify'); //transforms JSX to JS
 var source = require('vinyl-source-stream'); // use conventional text streams with Gulp
 var concat = require('gulp-concat'); // concats files
+var lint = require('gulp-eslint'); // lints js and jsx files
 
 var config = {
     port: 9005,
     devBaseUrl: "http://localhost",
     paths: {
 		html: './src/*.html',
-		js: '/src/**/*.js',
+		js: './src/**/*.js',
 		mainJs: './src/main.js',
 		css: [
 			'node_modules/bootstrap/dist/css/bootstrap-theme.min.css',
@@ -37,10 +38,11 @@ gulp.task('connect', function() {
 // notice the dependency on the connect taskm
 gulp.task('open', ['connect'],function() {
 	var options = {
-		url: config.devBaseUrl + ':' + config.port + '/'
+		uri: config.devBaseUrl + ':' + config.port + '/',
+		app: 'firefox'
 	}
     gulp.src('dist/index.html')
-        .pipe(open('<%file.path%>', options));
+        .pipe(open(options));
 });
 
 // move html files from src to dist and reload
@@ -65,17 +67,27 @@ gulp.task('js', function() {
 		.pipe(connect.reload());
 });
 
-// whenever something changes, run the html task
-gulp.task('watch', function() {
-    gulp.watch(config.paths.html, ['html']);
-    gulp.watch(config.paths.js, ['js']);
-});
-
 gulp.task('css', function() {
 	gulp.src(config.paths.css)
 		.pipe(concat('bundle.css'))
 		.pipe(gulp.dest(config.paths.dist + '/css'));
 });
 
+gulp.task('eslint', function() {
+	console.log("eslint task is running...")
+	return gulp.src([config.paths.js, '!node_modules/**'])
+		.pipe(lint())
+		.pipe(lint.format())
+		.pipe(lint.failAfterError());
+});
+
+// whenever something changes, run the html task
+gulp.task('watch', function() {
+    gulp.watch(config.paths.html, ['html']);
+    gulp.watch(config.paths.js, ['js','eslint']);
+});
+
+
+
 // this is what gets run by default by just saying gulp
-gulp.task('default', ['html', 'js', 'css', 'open', 'watch']);
+gulp.task('default', ['html', 'js', 'css', 'eslint', 'open', 'watch']);
