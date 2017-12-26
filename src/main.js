@@ -6,6 +6,8 @@ var createReactClass = require('create-react-class');
 
 var Home = require('./components/homePage');
 var About = require('./components/about/aboutPage');
+var Authors = require('./components/authors/authorPage');
+var Header = require('./components/common/header');
 
 (function(win) {
 	"use strict";
@@ -17,13 +19,20 @@ var About = require('./components/about/aboutPage');
 				case 'about':
 					Child = About;
 				break;
+				case 'authors':
+					Child = Authors;
+				break;
+				
 				default:
 					Child = Home;
 				break;
 			}
 
 			return (
-				<div><Child /></div>
+				<div>
+					<Header />
+					<Child />
+				</div>
 			);
 		}
 	});

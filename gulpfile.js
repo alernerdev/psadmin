@@ -15,6 +15,7 @@ var config = {
     paths: {
 		html: './src/*.html',
 		js: './src/**/*.js',
+		images: './src/images/*',
 		mainJs: './src/main.js',
 		css: [
 			'node_modules/bootstrap/dist/css/bootstrap-theme.min.css',
@@ -73,6 +74,15 @@ gulp.task('css', function() {
 		.pipe(gulp.dest(config.paths.dist + '/css'));
 });
 
+gulp.task('images', function() {
+	gulp.src(config.paths.images)
+		.pipe(gulp.dest(config.paths.dist + '/images'))
+		.pipe(connect.reload());
+
+	gulp.src('./src/favicon.ico')
+		.pipe(gulp.dest(config.paths.dist));
+});
+
 gulp.task('eslint', function() {
 	console.log("eslint task is running...")
 	return gulp.src([config.paths.js, '!node_modules/**'])
@@ -90,4 +100,4 @@ gulp.task('watch', function() {
 
 
 // this is what gets run by default by just saying gulp
-gulp.task('default', ['html', 'js', 'css', 'eslint', 'open', 'watch']);
+gulp.task('default', ['html', 'js', 'css', 'images', 'eslint', 'open', 'watch']);
