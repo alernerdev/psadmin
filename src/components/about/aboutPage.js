@@ -4,6 +4,24 @@ var React = require('react'); // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
 
 var About = createReactClass({
+
+	getInitialState: function() {
+		console.log("getInitialState is called");
+
+        return {
+            textValue: "blah"
+        };
+    },
+
+	componentDidMount: function() {
+		console.log("componentDidMount is called");
+	
+    },
+	
+	componentWillUnmount: function() {
+		console.log("componentWillUnmount is called");
+	},
+	
 	render: function() {
 		return (
 			<div>

@@ -2,19 +2,21 @@
 
 var React = require('react'); // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
+var Link = require('react-router-dom').Link;
 
 var Header = createReactClass({
 	render: function() {
 		return (
 			<nav className = "navbar navbar-default">
                 <div className = "container-fluid">
-                    <a href="/" className = "navbar-brand">
+                    {/* using react route links instead of the usual html anchors*/}
+                    <Link to="/" className = "navbar-brand">
                         <img src="images/doglogo.png" width="35px" height="35px"  />
-                    </a>
+                    </Link>
                     <ul className="nav navbar-nav">
-                        <li><a href="/">Home</a></li>
-                        <li><a href="/#about">About</a></li>
-                        <li><a href="/#authors">Authors</a></li>
+                        <li><Link to="/">Home</Link></li>
+                        <li><Link to="about">About</Link></li>
+                        <li><Link to="authors">Authors</Link></li>
                     </ul>
                 </div>
 			</nav>
