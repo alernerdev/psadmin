@@ -14,6 +14,7 @@ var AppRoutes = createReactClass({
             <Switch>
                 {/*Named routes as in "<Route name="about"...  have been removed*/}
                 <Route path="/authors" component={require('./components/authors/authorPage')} />
+                <Route path="/author" component={require('./components/authors/manageAuthorPage')} />
                 {/* lets say there was an old link that needs retiring*/}
                 <Redirect from="/about-us" to="about" />
                  <Route path="/about" component={require('./components/about/aboutPage')} />

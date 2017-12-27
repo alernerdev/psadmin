@@ -2,6 +2,7 @@
 
 var React = require('react'); // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
+var Link = require('react-router-dom').Link;
 var AuthorApi = require('../../api/authorApi');
 var AuthorList = require('./authorList'); // eslint-disable-line no-unused-vars
 
@@ -27,6 +28,7 @@ var AuthorPage = createReactClass({
 		return (
            <div>
                <h1>Authors</h1>
+               <Link to="author" className="btn btn-default">Add Author</Link>
                <AuthorList authors={this.state.authors} />
             </div>
 		);

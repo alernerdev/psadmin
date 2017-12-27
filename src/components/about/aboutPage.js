@@ -7,10 +7,7 @@ var About = createReactClass({
 
 	getInitialState: function() {
 		console.log("getInitialState is called");
-
-        return {
-            textValue: "blah"
-        };
+		return {}
     },
 
 	componentDidMount: function() {

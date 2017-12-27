@@ -50375,10 +50375,7 @@ var About = createReactClass({
 
 	getInitialState: function() {
 		console.log("getInitialState is called");
-
-        return {
-            textValue: "blah"
-        };
+		return {}
     },
 
 	componentDidMount: function() {
@@ -50436,7 +50433,38 @@ var App = createReactClass({
 });
 
 module.exports = App;
-},{"../routes":82,"./common/header":78,"create-react-class":2,"jquery":29,"react":68}],76:[function(require,module,exports){
+},{"../routes":85,"./common/header":80,"create-react-class":2,"jquery":29,"react":68}],76:[function(require,module,exports){
+"use strict";
+
+var React = require('react'); // eslint-disable-line no-unused-vars
+var createReactClass = require('create-react-class');
+var TextInput = require('../common/textInput');
+
+var AuthorForm = createReactClass({
+    render: function() {
+        return (
+            React.createElement("form", null, 
+                React.createElement(TextInput, {
+                    name: "firstName", 
+                    label: " First Name", 
+                    onChange: this.props.onChange, 
+                    value: this.props.author.firstName}), 
+
+                React.createElement(TextInput, {
+                    name: "lastName", 
+                    label: " Last Name", 
+                    onChange: this.props.onChange, 
+                    value: this.props.author.lastName}), 
+
+                React.createElement("input", {type: "submit", value: "Save", className: "btn btn-default"})
+            )
+        );
+    }
+});
+
+module.exports = AuthorForm;
+
+},{"../common/textInput":81,"create-react-class":2,"react":68}],77:[function(require,module,exports){
 "use strict";
 
 var React = require('react'); // eslint-disable-line no-unused-vars
@@ -50483,11 +50511,12 @@ var AuthorList = createReactClass({
 });
 
 module.exports = AuthorList;
-},{"create-react-class":2,"prop-types":38,"react":68}],77:[function(require,module,exports){
+},{"create-react-class":2,"prop-types":38,"react":68}],78:[function(require,module,exports){
 "use strict";
 
 var React = require('react'); // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
+var Link = require('react-router-dom').Link;
 var AuthorApi = require('../../api/authorApi');
 var AuthorList = require('./authorList'); // eslint-disable-line no-unused-vars
 
@@ -50513,6 +50542,7 @@ var AuthorPage = createReactClass({
 		return (
            React.createElement("div", null, 
                React.createElement("h1", null, "Authors"), 
+               React.createElement(Link, {to: "author", className: "btn btn-default"}, "Add Author"), 
                React.createElement(AuthorList, {authors: this.state.authors})
             )
 		);
@@ -50520,12 +50550,49 @@ var AuthorPage = createReactClass({
 });
 
 module.exports = AuthorPage;
-},{"../../api/authorApi":72,"./authorList":76,"create-react-class":2,"react":68}],78:[function(require,module,exports){
+},{"../../api/authorApi":72,"./authorList":77,"create-react-class":2,"react":68,"react-router-dom":54}],79:[function(require,module,exports){
+"use strict";
+
+var React = require('react'); /* eslint-disable-line no-unused-vars */
+var createReactClass = require('create-react-class');
+var AuthorForm = require('./authorForm');
+
+var ManageAuthorPage = createReactClass({
+    getInitialState: function() {
+        return {
+            author: { id: '', firstName: '', lastName: ''}
+        }
+    },
+
+    // this gets called for every keystroke in the child form
+    // because we pass it into the child form
+    setAuthorState: function(event) {
+        var field = event.target.name;
+        var value = event.target.value;
+        this.state.author[field] = value;
+        return this.setState({author: this.state.author});
+    },
+
+    render: function() {
+        return (
+            React.createElement("div", null, 
+                React.createElement("h1", null, "Manage Author"), 
+                React.createElement(AuthorForm, {
+                    author: this.state.author, 
+                    onChange: this.setAuthorState})
+            )
+        );
+    }
+});
+
+module.exports = ManageAuthorPage;
+
+},{"./authorForm":76,"create-react-class":2,"react":68}],80:[function(require,module,exports){
 "use strict";
 
 var React = require('react'); // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
-var Link = require('react-router-dom').Link;
+var Link = require('react-router-dom').Link; // eslint-disable-line no-unused-vars
 
 var Header = createReactClass({
 	render: function() {
@@ -50549,8 +50616,57 @@ var Header = createReactClass({
 
 module.exports = Header;
 
-},{"create-react-class":2,"react":68,"react-router-dom":54}],79:[function(require,module,exports){
+},{"create-react-class":2,"react":68,"react-router-dom":54}],81:[function(require,module,exports){
 "use strict";
+
+var React = require('react'); /* eslint-disable-line no-unused-vars */
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
+
+var TextInput = createReactClass({
+    propTypes : {
+        name: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        onChange: PropTypes.func.isRequired,
+        placeholder: PropTypes.string,
+        value: PropTypes.string,
+        error: PropTypes.string
+    },
+
+    render: function() {
+        /* if error text is set, I want the bootstrap class that draws a red line
+        around the text field where the error is
+        */
+        var wrapperClass = 'form-group';
+        if (this.props.error && this.props.error.length > 0) {
+            wrapperClass += " " + "has-error";
+        };
+
+        return (
+            React.createElement("div", {className: wrapperClass}, 
+                React.createElement("label", {htmlFor: this.props.name}, this.props.label), 
+                React.createElement("div", {className: "field"}, " ", /* field is a bootstrap class*/
+                    React.createElement("input", {type: "text", 
+                    name: this.props.name, 
+                    className: "form-control", 
+                    placeholder: this.props.placeholder, 
+                    ref: this.props.name, 
+                    /* this is the keystroke callback*/
+                    onChange: this.props.onChange, 
+                    value: this.props.value}), 
+                    React.createElement("div", {className: "input"}, this.props.error)
+                )
+            )
+        );
+    }
+});
+
+module.exports = TextInput;
+
+},{"create-react-class":2,"prop-types":38,"react":68}],82:[function(require,module,exports){
+"use strict";
+
+/* eslint-disable no-unused-vars */
 
 var React = require('react');
 var createReactClass = require('create-react-class');
@@ -50569,7 +50685,7 @@ var Custom404Page = createReactClass({
 });
 
 module.exports = Custom404Page;
-},{"create-react-class":2,"react":68,"react-router-dom":54}],80:[function(require,module,exports){
+},{"create-react-class":2,"react":68,"react-router-dom":54}],83:[function(require,module,exports){
 "use strict";
 
 var React = require('react'); // eslint-disable-line no-unused-vars
@@ -50589,7 +50705,7 @@ var Home = createReactClass({
 });
 
 module.exports = Home;
-},{"create-react-class":2,"react":68,"react-router-dom":54}],81:[function(require,module,exports){
+},{"create-react-class":2,"react":68,"react-router-dom":54}],84:[function(require,module,exports){
 // this is the starting point for browserify packaging
 
 /* eslint-disable no-unused-vars */
@@ -50606,7 +50722,7 @@ ReactDOM.render((
     React.createElement(App, null)
   )
 ), document.getElementById('app'));
-},{"./components/app":75,"react":68,"react-dom":42,"react-router-dom":54}],82:[function(require,module,exports){
+},{"./components/app":75,"react":68,"react-dom":42,"react-router-dom":54}],85:[function(require,module,exports){
 "use strict";
 
 var React = require('react'); // eslint-disable-line no-unused-vars
@@ -50623,6 +50739,7 @@ var AppRoutes = createReactClass({
             React.createElement(Switch, null, 
                 /*Named routes as in "<Route name="about"...  have been removed*/
                 React.createElement(Route, {path: "/authors", component: require('./components/authors/authorPage')}), 
+                React.createElement(Route, {path: "/author", component: require('./components/authors/manageAuthorPage')}), 
                 /* lets say there was an old link that needs retiring*/
                 React.createElement(Redirect, {from: "/about-us", to: "about"}), 
                  React.createElement(Route, {path: "/about", component: require('./components/about/aboutPage')}), 
@@ -50636,4 +50753,4 @@ var AppRoutes = createReactClass({
 });
 
 module.exports = AppRoutes;
-},{"./components/about/aboutPage":74,"./components/authors/authorPage":77,"./components/custom404Page":79,"./components/homePage":80,"create-react-class":2,"react":68,"react-router-dom":54}]},{},[81]);
+},{"./components/about/aboutPage":74,"./components/authors/authorPage":78,"./components/authors/manageAuthorPage":79,"./components/custom404Page":82,"./components/homePage":83,"create-react-class":2,"react":68,"react-router-dom":54}]},{},[84]);

@@ -1,5 +1,7 @@
 "use strict";
 
+/* eslint-disable no-unused-vars */
+
 var React = require('react');
 var createReactClass = require('create-react-class');
 var Link = require('react-router-dom').Link;
