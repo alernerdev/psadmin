@@ -5,15 +5,19 @@ var Switch = require('react-router-dom').Switch;
 var Route = require('react-router-dom').Route;
 var createReactClass = require('create-react-class');
 
-// when path is missing on the route, it uses "name" as the path
-var AppRoutes = function(){
-        <main>
+var AppRoutes = createReactClass({
+	render: function() {
+		// notice the catchall / is at the bottom.
+		return (
+        <div>
             <Switch>
-                <Route exact path="/" component={require('./components/homePage')} />
                 <Route path="/authors" component={require('./components/authors/authorPage')} />
                 <Route path="/about" component={require('./components/about/aboutPage')} />
+                <Route path="/" component={require('./components/homePage')} />
             </Switch>
-        </main>
-}
+        </div>
+		);
+	}
+});
 
 module.exports = AppRoutes;

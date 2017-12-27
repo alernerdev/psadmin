@@ -6,14 +6,8 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
-var HashRouter = require('react-router-dom');
+var HashRouter = require('react-router-dom').HashRouter;
 var App = require('./components/app');
-
-/*
-Router.run(routes, function(Handler) {
-	React.render(<Handler/>, document.getElementById('app'));
-});
-*/
 
 ReactDOM.render((
   <HashRouter>
