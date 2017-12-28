@@ -2,7 +2,7 @@
 
 var React = require('react'); // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
-var Link = require('react-router-dom').Link;
+var Link = require('react-router-dom').Link; // eslint-disable-line no-unused-vars
 
 var Home = createReactClass({
 	render: function() {

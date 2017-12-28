@@ -12,13 +12,12 @@ var About = createReactClass({
 
 	componentDidMount: function() {
 		console.log("componentDidMount is called");
-	
     },
-	
+
 	componentWillUnmount: function() {
 		console.log("componentWillUnmount is called");
 	},
-	
+
 	render: function() {
 		return (
 			<div>

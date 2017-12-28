@@ -1,9 +1,9 @@
 "use strict";
 
 var React = require('react'); // eslint-disable-line no-unused-vars
-var Switch = require('react-router-dom').Switch;
-var Route = require('react-router-dom').Route;
-var Redirect = require('react-router-dom').Redirect;
+var Switch = require('react-router-dom').Switch; // eslint-disable-line no-unused-vars
+var Route = require('react-router-dom').Route; // eslint-disable-line no-unused-vars
+var Redirect = require('react-router-dom').Redirect; // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
 
 var AppRoutes = createReactClass({

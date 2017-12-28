@@ -1,6 +1,6 @@
 "use strict";
 
-var React = require('react'); /* eslint-disable-line no-unused-vars */
+var React = require('react'); // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
 var PropTypes = require('prop-types');
 

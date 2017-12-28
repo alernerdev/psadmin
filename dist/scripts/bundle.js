@@ -50380,13 +50380,12 @@ var About = createReactClass({
 
 	componentDidMount: function() {
 		console.log("componentDidMount is called");
-	
     },
-	
+
 	componentWillUnmount: function() {
 		console.log("componentWillUnmount is called");
 	},
-	
+
 	render: function() {
 		return (
 			React.createElement("div", null, 
@@ -50438,7 +50437,7 @@ module.exports = App;
 
 var React = require('react'); // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
-var TextInput = require('../common/textInput');
+var TextInput = require('../common/textInput'); // eslint-disable-line no-unused-vars
 
 var AuthorForm = createReactClass({
     render: function() {
@@ -50456,7 +50455,9 @@ var AuthorForm = createReactClass({
                     onChange: this.props.onChange, 
                     value: this.props.author.lastName}), 
 
-                React.createElement("input", {type: "submit", value: "Save", className: "btn btn-default"})
+                React.createElement("input", {
+                    type: "submit", value: "Save", 
+                    className: "btn btn-default", onClick: this.props.onSave})
             )
         );
     }
@@ -50516,7 +50517,7 @@ module.exports = AuthorList;
 
 var React = require('react'); // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
-var Link = require('react-router-dom').Link;
+var Link = require('react-router-dom').Link; // eslint-disable-line no-unused-vars
 var AuthorApi = require('../../api/authorApi');
 var AuthorList = require('./authorList'); // eslint-disable-line no-unused-vars
 
@@ -50553,14 +50554,29 @@ module.exports = AuthorPage;
 },{"../../api/authorApi":72,"./authorList":77,"create-react-class":2,"react":68,"react-router-dom":54}],79:[function(require,module,exports){
 "use strict";
 
-var React = require('react'); /* eslint-disable-line no-unused-vars */
+var React = require('react'); // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
-var AuthorForm = require('./authorForm');
+var ReactDOM = require('react-dom'); // eslint-disable-line no-unused-vars
+var withRouter = require('react-router-dom');
+var Prompt = withRouter.Prompt; 
+var PropTypes = require('prop-types');
+
+var AuthorForm = require('./authorForm'); // eslint-disable-line no-unused-vars
+var AuthorApi = require('../../api/authorApi');
+
+/* this code implements a form, but also shows how NOT to navigate from it if the data
+is not saved*/
 
 var ManageAuthorPage = createReactClass({
+    propTypes : {
+        history: PropTypes.object.isRequired,
+        location: PropTypes.object.isRequired
+    },
+
     getInitialState: function() {
         return {
-            author: { id: '', firstName: '', lastName: ''}
+            author: { id: '', firstName: '', lastName: ''},
+            isBlocking: false
         }
     },
 
@@ -50570,16 +50586,63 @@ var ManageAuthorPage = createReactClass({
         var field = event.target.name;
         var value = event.target.value;
         this.state.author[field] = value;
-        return this.setState({author: this.state.author});
+
+        return this.setState(
+            {author: this.state.author, isBlocking : this.isFormDirty(this.state.author)}
+        );
+    },
+
+    // if any field in the author is dirty, the form is dirty
+    isFormDirty : function(author) {
+        for (var field in author) {
+            var value = author[field];
+            console.log("author field is " + field + " " + value);
+            if (value.length > 0) {
+                console.log("form is dirty, returning true");
+                return true;
+            }
+        }
+
+        console.log("form is clean, returning false");
+        return false;
+    },
+
+    saveAuthor: function(event) {
+        console.log("calling saveAuthor and blocking now is " + this.state.isBlocking);
+        this.state.isBlocking = false;
+        this.setState({isBlocking : this.state.isBlocking});
+        console.log("I have set it to false and it is now " + this.state.isBlocking);
+
+        // we dont want the submit button on the page to actually submit
+        event.preventDefault();
+
+        AuthorApi.saveAuthor(this.state.author);
+
+        // this stuff comes in from withRouter
+        var history = this.props.history;
+        // after saving an author, transition to the list of authors page
+        history.push('authors');
     },
 
     render: function() {
+        // this stuff comes in from withRouter
+        var location = this.props.location;
+
+        var isBlocking = this.state.isBlocking;
+        console.log("isBlocking in render is " + isBlocking);
+
         return (
             React.createElement("div", null, 
                 React.createElement("h1", null, "Manage Author"), 
                 React.createElement(AuthorForm, {
                     author: this.state.author, 
-                    onChange: this.setAuthorState})
+                    onChange: this.setAuthorState, 
+                    onSave: this.saveAuthor}), 
+
+                React.createElement(Prompt, {
+                    when: isBlocking, 
+                    message: "You havent saved your form data. Are you sure you want to go to " + location.pathname}
+                    )
             )
         );
     }
@@ -50587,7 +50650,7 @@ var ManageAuthorPage = createReactClass({
 
 module.exports = ManageAuthorPage;
 
-},{"./authorForm":76,"create-react-class":2,"react":68}],80:[function(require,module,exports){
+},{"../../api/authorApi":72,"./authorForm":76,"create-react-class":2,"prop-types":38,"react":68,"react-dom":42,"react-router-dom":54}],80:[function(require,module,exports){
 "use strict";
 
 var React = require('react'); // eslint-disable-line no-unused-vars
@@ -50619,7 +50682,7 @@ module.exports = Header;
 },{"create-react-class":2,"react":68,"react-router-dom":54}],81:[function(require,module,exports){
 "use strict";
 
-var React = require('react'); /* eslint-disable-line no-unused-vars */
+var React = require('react'); // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
 var PropTypes = require('prop-types');
 
@@ -50690,7 +50753,7 @@ module.exports = Custom404Page;
 
 var React = require('react'); // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
-var Link = require('react-router-dom').Link;
+var Link = require('react-router-dom').Link; // eslint-disable-line no-unused-vars
 
 var Home = createReactClass({
 	render: function() {
@@ -50726,9 +50789,9 @@ ReactDOM.render((
 "use strict";
 
 var React = require('react'); // eslint-disable-line no-unused-vars
-var Switch = require('react-router-dom').Switch;
-var Route = require('react-router-dom').Route;
-var Redirect = require('react-router-dom').Redirect;
+var Switch = require('react-router-dom').Switch; // eslint-disable-line no-unused-vars
+var Route = require('react-router-dom').Route; // eslint-disable-line no-unused-vars
+var Redirect = require('react-router-dom').Redirect; // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
 
 var AppRoutes = createReactClass({
