@@ -6,6 +6,7 @@ var ReactDOM = require('react-dom'); // eslint-disable-line no-unused-vars
 var withRouter = require('react-router-dom');
 var Prompt = withRouter.Prompt;
 var PropTypes = require('prop-types');
+var toaster = require('toastr');
 
 var AuthorForm = require('./authorForm'); // eslint-disable-line no-unused-vars
 var AuthorApi = require('../../api/authorApi');
@@ -22,7 +23,8 @@ var ManageAuthorPage = createReactClass({
     getInitialState: function() {
         return {
             author: { id: '', firstName: '', lastName: ''},
-            isBlocking: false
+            isBlocking: false,
+            errors: {}
         }
     },
 
@@ -44,6 +46,10 @@ var ManageAuthorPage = createReactClass({
 
     // if any field in the author is dirty, the form is dirty
     isFormDirty : function(author) {
+
+        // TODO would like to get this working
+        return false;
+
         for (var field in author) {
             var value = author[field];
             console.log("author field is " + field + " " + value);
@@ -57,12 +63,34 @@ var ManageAuthorPage = createReactClass({
         return false;
     },
 
+    authorFormIsValid: function() {
+        var formIsValid = true;
+        this.state.errors = {}; // clear out previous errors if any
+
+        if (this.state.author.firstName.length < 3) {
+            this.state.errors.firstName = "First name must be at least chars long";
+            formIsValid = false;
+        }
+        if (this.state.author.lastName.length < 3) {
+            this.state.errors.lastName = "Last name must be at least chars long";
+            formIsValid = false;
+        }
+        this.setState({errors: this.state.errors});
+        return formIsValid;
+    },
+
     saveAuthor: function(event) {
         // we dont want the submit button on the page to actually submit
 		event.preventDefault();
 
+        if (!this.authorFormIsValid()) {
+            return;
+        }
+
 		// call out to the database
         AuthorApi.saveAuthor(this.state.author);
+
+        toaster.success('Author saved');
 
         // this stuff comes in from withRouter
         var history = this.props.history;
@@ -83,7 +111,8 @@ var ManageAuthorPage = createReactClass({
                 <AuthorForm
                     author={this.state.author}
                     onChange={this.setAuthorState}
-                    onSave = {this.saveAuthor} />
+                    onSave = {this.saveAuthor}
+                    errors = {this.state.errors}/>
 
                 <Prompt
                     when={isBlocking}
