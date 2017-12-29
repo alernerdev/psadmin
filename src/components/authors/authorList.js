@@ -3,6 +3,7 @@
 var React = require('react'); // eslint-disable-line no-unused-vars
 var PropTypes = require('prop-types');
 var createReactClass = require('create-react-class');
+var Link = require('react-router-dom').Link; // eslint-disable-line no-unused-vars
 
 /* this component has markup only -- the data is passed into it */
 var AuthorList = createReactClass({
@@ -16,7 +17,7 @@ var AuthorList = createReactClass({
                 // key is needed by react
                 <tr key={author.id}>
                     <td>
-                        <a href={"/#authors/" + author.id}>{author.id}</a>
+                        <Link to="/author:id" params={{id: author.id}}>{author.id}</Link>
                     </td>
                     <td>
                         {author.firstName} {author.lastName}

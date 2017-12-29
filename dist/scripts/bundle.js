@@ -50959,6 +50959,7 @@ module.exports = AuthorForm;
 var React = require('react'); // eslint-disable-line no-unused-vars
 var PropTypes = require('prop-types');
 var createReactClass = require('create-react-class');
+var Link = require('react-router-dom').Link; // eslint-disable-line no-unused-vars
 
 /* this component has markup only -- the data is passed into it */
 var AuthorList = createReactClass({
@@ -50972,7 +50973,7 @@ var AuthorList = createReactClass({
                 // key is needed by react
                 React.createElement("tr", {key: author.id}, 
                     React.createElement("td", null, 
-                        React.createElement("a", {href: "/#authors/" + author.id}, author.id)
+                        React.createElement(Link, {to: "/author:id", params: {id: author.id}}, author.id)
                     ), 
                     React.createElement("td", null, 
                         author.firstName, " ", author.lastName
@@ -51000,7 +51001,7 @@ var AuthorList = createReactClass({
 });
 
 module.exports = AuthorList;
-},{"create-react-class":2,"prop-types":38,"react":68}],79:[function(require,module,exports){
+},{"create-react-class":2,"prop-types":38,"react":68,"react-router-dom":54}],79:[function(require,module,exports){
 "use strict";
 
 var React = require('react'); // eslint-disable-line no-unused-vars
@@ -51066,8 +51067,13 @@ var ManageAuthorPage = createReactClass({
         return {
             author: { id: '', firstName: '', lastName: ''},
             isBlocking: false,
-            errors: {}
+            errors: {},
         }
+    },
+
+    componentWillMount : function() {
+        // calling setState here does not cause a re-render
+        console.log("ID " + JSON.stringify(this.props.match.params));
     },
 
     // this gets called for every keystroke in the child form
@@ -51131,6 +51137,8 @@ var ManageAuthorPage = createReactClass({
 
 		// call out to the database
         AuthorApi.saveAuthor(this.state.author);
+
+        this.setState({isBlocking : this.isFormDirty(this.state.author)});
 
         toaster.success('Author saved');
 
@@ -51319,9 +51327,10 @@ var AppRoutes = createReactClass({
                 /*Named routes as in "<Route name="about"...  have been removed*/
                 React.createElement(Route, {path: "/authors", component: require('./components/authors/authorPage')}), 
                 React.createElement(Route, {path: "/author", component: require('./components/authors/manageAuthorPage')}), 
-                /* lets say there was an old link that needs retiring*/
+                React.createElement(Route, {path: "/author:id", component: require('./components/authors/manageAuthorPage')}), 
+                /* lets say there was an old link that needs retiring. Redirecting*/
                 React.createElement(Redirect, {from: "/about-us", to: "about"}), 
-                 React.createElement(Route, {path: "/about", component: require('./components/about/aboutPage')}), 
+                React.createElement(Route, {path: "/about", component: require('./components/about/aboutPage')}), 
                 /* when using 'exact path' it doesnt route to home page when url is invalid */ 
                 React.createElement(Route, {exact: true, path: "/", component: require('./components/homePage')}), 
                 React.createElement(Route, {path: "/", component: require('./components/custom404Page')})

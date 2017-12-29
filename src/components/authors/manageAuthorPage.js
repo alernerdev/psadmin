@@ -24,8 +24,13 @@ var ManageAuthorPage = createReactClass({
         return {
             author: { id: '', firstName: '', lastName: ''},
             isBlocking: false,
-            errors: {}
+            errors: {},
         }
+    },
+
+    componentWillMount : function() {
+        // calling setState here does not cause a re-render
+        console.log("ID " + JSON.stringify(this.props.match.params));
     },
 
     // this gets called for every keystroke in the child form
@@ -89,6 +94,8 @@ var ManageAuthorPage = createReactClass({
 
 		// call out to the database
         AuthorApi.saveAuthor(this.state.author);
+
+        this.setState({isBlocking : this.isFormDirty(this.state.author)});
 
         toaster.success('Author saved');
 
