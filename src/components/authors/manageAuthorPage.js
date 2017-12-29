@@ -4,7 +4,7 @@ var React = require('react'); // eslint-disable-line no-unused-vars
 var createReactClass = require('create-react-class');
 var ReactDOM = require('react-dom'); // eslint-disable-line no-unused-vars
 var withRouter = require('react-router-dom');
-var Prompt = withRouter.Prompt; 
+var Prompt = withRouter.Prompt;
 var PropTypes = require('prop-types');
 
 var AuthorForm = require('./authorForm'); // eslint-disable-line no-unused-vars
@@ -30,11 +30,15 @@ var ManageAuthorPage = createReactClass({
     // because we pass it into the child form
     setAuthorState: function(event) {
         var field = event.target.name;
-        var value = event.target.value;
-        this.state.author[field] = value;
+		var value = event.target.value;
 
+		// treating state as immutable, making a copy of author
+		var author  = Object.assign({}, this.state.author);
+		author[field] = value;
+
+		// and setting a new state
         return this.setState(
-            {author: this.state.author, isBlocking : this.isFormDirty(this.state.author)}
+            {author: author, isBlocking : this.isFormDirty(author)}
         );
     },
 
@@ -54,14 +58,10 @@ var ManageAuthorPage = createReactClass({
     },
 
     saveAuthor: function(event) {
-        console.log("calling saveAuthor and blocking now is " + this.state.isBlocking);
-        this.state.isBlocking = false;
-        this.setState({isBlocking : this.state.isBlocking});
-        console.log("I have set it to false and it is now " + this.state.isBlocking);
-
         // we dont want the submit button on the page to actually submit
-        event.preventDefault();
+		event.preventDefault();
 
+		// call out to the database
         AuthorApi.saveAuthor(this.state.author);
 
         // this stuff comes in from withRouter
@@ -74,7 +74,7 @@ var ManageAuthorPage = createReactClass({
         // this stuff comes in from withRouter
         var location = this.props.location;
 
-        var isBlocking = this.state.isBlocking;
+		var isBlocking = this.state.isBlocking;
         console.log("isBlocking in render is " + isBlocking);
 
         return (
@@ -86,7 +86,7 @@ var ManageAuthorPage = createReactClass({
                     onSave = {this.saveAuthor} />
 
                 <Prompt
-                    when={isBlocking} 
+                    when={isBlocking}
                     message = {"You havent saved your form data. Are you sure you want to go to " + location.pathname}
                     />
             </div>

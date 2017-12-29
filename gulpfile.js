@@ -8,6 +8,11 @@ var reactify = require('reactify'); //transforms JSX to JS
 var source = require('vinyl-source-stream'); // use conventional text streams with Gulp
 var concat = require('gulp-concat'); // concats files
 var lint = require('gulp-eslint'); // lints js and jsx files
+var log = require('fancy-log'); // loging from gulp -> console plus timestamp
+var bytediff = require('gulp-bytediff'); // shows before/after size difference
+var cleanCSS = require('gulp-clean-css'); // css minifier
+var rename = require("gulp-rename"); // file renaming
+var less = require('gulp-less'); // convert less files to css
 
 var config = {
     port: 9005,
@@ -21,6 +26,7 @@ var config = {
 			'node_modules/bootstrap/dist/css/bootstrap-theme.min.css',
 			'node_modules/bootstrap/dist/css/bootstrap.min.css'
 		],
+		less: 'node_modules/toastr.less',
         dist: './dist',
     }
 }
@@ -60,6 +66,8 @@ gulp.task('html', function() {
 	- copy bundle.js over to dist directory
 */
 gulp.task('js', function() {
+	log.info('Bundling js files');
+
 	browserify(config.paths.mainJs)
 		.transform(reactify).bundle()
 		.on('error', console.error.bind(console))
@@ -68,13 +76,31 @@ gulp.task('js', function() {
 		.pipe(connect.reload());
 });
 
-gulp.task('css', function() {
+gulp.task('less', function () {
+    log.info('Bundling Less files');
+
+    gulp.src(config.paths.less)
+		//.pipe(less())
+		.pipe(less().on('error', log))
+        .pipe(gulp.dest(config.paths.dist + '/css'));
+		//.pipe(bytediff.start())
+		//.pipe(cleanCSS({compatibility: '*'}))
+        //.pipe(bytediff.stop(bytediffFormatter))
+        //.pipe(rename('toastr.min.css'));
+        //.pipe(gulp.dest(config.paths.dist + '/css'));
+});
+
+gulp.task('css', ['less'], function() {
+	log.info('Bundling CSS files');
+
 	gulp.src(config.paths.css)
 		.pipe(concat('bundle.css'))
 		.pipe(gulp.dest(config.paths.dist + '/css'));
 });
 
 gulp.task('images', function() {
+	log.info('Bundling images');
+
 	gulp.src(config.paths.images)
 		.pipe(gulp.dest(config.paths.dist + '/images'))
 		.pipe(connect.reload());
@@ -84,7 +110,8 @@ gulp.task('images', function() {
 });
 
 gulp.task('eslint', function() {
-	console.log("eslint task is running...")
+	log.info("linting...")
+
 	return gulp.src([config.paths.js, '!node_modules/**'])
 		.pipe(lint())
 		.pipe(lint.format())
@@ -100,4 +127,26 @@ gulp.task('watch', function() {
 
 
 // this is what gets run by default by just saying gulp
-gulp.task('default', ['html', 'js', 'css', 'images', 'eslint', 'open', 'watch']);
+gulp.task('default', ['html', 'js', 'less', 'css', 'images', 'eslint', 'open', 'watch']);
+
+/**
+ * Formatter for bytediff to display the size changes after processing
+ * @param  {Object} data - byte data
+ * @return {String}      Difference in bytes, formatted
+ */
+function bytediffFormatter(data) {
+    var difference = (data.savings > 0) ? ' smaller.' : ' larger.';
+    return data.fileName + ' went from ' +
+        (data.startSize / 1000).toFixed(2) + ' kB to ' + (data.endSize / 1000).toFixed(2) + ' kB' +
+        ' and is ' + formatPercent(1 - data.percent, 2) + '%' + difference;
+}
+
+/**
+ * Format a number as a percentage
+ * @param  {Number} num       Number to format as a percent
+ * @param  {Number} precision Precision of the decimal
+ * @return {Number}           Formatted perentage
+ */
+function formatPercent(num, precision) {
+    return (num * 100).toFixed(precision);
+}
