@@ -9,10 +9,11 @@ var source = require('vinyl-source-stream'); // use conventional text streams wi
 var concat = require('gulp-concat'); // concats files
 var lint = require('gulp-eslint'); // lints js and jsx files
 var log = require('fancy-log'); // loging from gulp -> console plus timestamp
-var bytediff = require('gulp-bytediff'); // shows before/after size difference
+var byteDiff = require('gulp-bytediff'); // shows before/after size difference
 var cleanCSS = require('gulp-clean-css'); // css minifier
 var rename = require("gulp-rename"); // file renaming
 var less = require('gulp-less'); // convert less files to css
+var del = require('del');
 
 var config = {
     port: 9005,
@@ -26,7 +27,7 @@ var config = {
 			'node_modules/bootstrap/dist/css/bootstrap-theme.min.css',
 			'node_modules/bootstrap/dist/css/bootstrap.min.css'
 		],
-		less: 'node_modules/toastr.less',
+		less: 'node_modules/toastr/toastr.less',
         dist: './dist',
     }
 }
@@ -66,8 +67,6 @@ gulp.task('html', function() {
 	- copy bundle.js over to dist directory
 */
 gulp.task('js', function() {
-	log.info('Bundling js files');
-
 	browserify(config.paths.mainJs)
 		.transform(reactify).bundle()
 		.on('error', console.error.bind(console))
@@ -77,30 +76,43 @@ gulp.task('js', function() {
 });
 
 gulp.task('less', function () {
-    log.info('Bundling Less files');
+	var cssDir = config.paths.dist + '/css';
 
     gulp.src(config.paths.less)
-		//.pipe(less())
 		.pipe(less().on('error', log))
-        .pipe(gulp.dest(config.paths.dist + '/css'));
-		//.pipe(bytediff.start())
-		//.pipe(cleanCSS({compatibility: '*'}))
-        //.pipe(bytediff.stop(bytediffFormatter))
-        //.pipe(rename('toastr.min.css'));
-        //.pipe(gulp.dest(config.paths.dist + '/css'));
+        .pipe(gulp.dest(cssDir))
+		.pipe(byteDiff.start())
+		.pipe(cleanCSS({compatibility: '*'}))
+        .pipe(byteDiff.stop(bytediffFormatter))
+        .pipe(rename('toastr.min.css'))
+		.pipe(gulp.dest(cssDir));
+	
 });
 
-gulp.task('css', ['less'], function() {
-	log.info('Bundling CSS files');
+gulp.task('css', function() {
+	var cssDir = config.paths.dist + '/css';
 
 	gulp.src(config.paths.css)
 		.pipe(concat('bundle.css'))
 		.pipe(gulp.dest(config.paths.dist + '/css'));
 });
 
-gulp.task('images', function() {
-	log.info('Bundling images');
+gulp.task('deleteNotNeeded', function() {
+	var cssDir = config.paths.dist + '/css';
 
+	// delete un-minified toastr.css file produced by less
+	var s = cssDir + '/toastr.css';
+	del([s]).then(function(paths) {
+		log.info('Deleted files:\n', paths.join('\n'));
+	});		
+});
+
+gulp.task('vendorcss', ['css', 'less'], function() {
+	// although this code runs, it doesnt actually delete the file -- dont know why
+	gulp.run('deleteNotNeeded');
+});
+
+gulp.task('images', function() {
 	gulp.src(config.paths.images)
 		.pipe(gulp.dest(config.paths.dist + '/images'))
 		.pipe(connect.reload());
@@ -110,8 +122,6 @@ gulp.task('images', function() {
 });
 
 gulp.task('eslint', function() {
-	log.info("linting...")
-
 	return gulp.src([config.paths.js, '!node_modules/**'])
 		.pipe(lint())
 		.pipe(lint.format())
@@ -127,7 +137,7 @@ gulp.task('watch', function() {
 
 
 // this is what gets run by default by just saying gulp
-gulp.task('default', ['html', 'js', 'less', 'css', 'images', 'eslint', 'open', 'watch']);
+gulp.task('default', ['html', 'js', 'vendorcss', 'images', 'eslint', 'open', 'watch']);
 
 /**
  * Formatter for bytediff to display the size changes after processing
